@@ -1,0 +1,82 @@
+name: Development Build (Galaxy A50)
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'main'
+      - 'wip-*'
+
+jobs:
+  oneui-s-e:
+    name: Build One UI 5 (Enforcing)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      
+    steps:
+    - name: Set up Android environment
+      uses: android-actions/setup-android@v2
+      with:
+        sdk-version: '13'
+        build-tools-version: '32.0.0'
+        target-platform: 'android-33'
+        
+      # Add steps for building the kernel here.
+
+  oneui-s-m:
+    name: Build One UI 5 (Enforcing; Magisk Canary)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      
+    steps:
+    - name: Set up Android environment
+      uses: android-actions/setup-android@v2
+      with:
+        sdk-version: '13'
+        build-tools-version: '32.0.0'
+        target-platform: 'android-33'
+        
+      # Add steps for building the kernel here.
+
+  oneui-s-p:
+    name: Build One UI 5 (Permissive)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      
+    steps:
+    - name: Set up Android environment
+      uses: android-actions/setup-android@v2
+      with:
+        sdk-version: '13'
+        build-tools-version: '32.0.0'
+        target-platform: 'android-33'
+        
+      # Add steps for building the kernel here.
+
+  # Jobs for other variants (Magisk Canary, AOSP, etc.) follow a similar structure with Android 13 setup.
+
+  release:
+    name: Release files and configs
+    if: ${{ !contains(github.event.head_commit.message, '[skip rel]') }}
+    needs: [oneui-s-e]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+    - uses: actions/checkout@v2
+
+
+    - name: Zip release files and configs
+      run: zip -r release_files_and_configs.zip .
+
+    - name: Upload release
+      uses: actions/upload-artifact@v2
+      with:
+        name: Release Files and Configs
+        path: release_files_and_configs.zip
